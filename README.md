@@ -593,7 +593,5 @@ In the final step, the combined RFM scores are matched against the Segmentation 
 
 ## 📌 Key Takeaways:  
 ✔️ Understand how **RFM analysis** can be used to evaluate customer behavior based on purchase frequency and spending value.  
-
 ✔️ **Classify customers** into specific segments using RFM scores, helping identify which segments require enhanced experiences and which should be retained and nurtured to move toward higher-value tiers.  
-
 ✔️ Determine the **optimal timing** for launching promotional campaigns and upselling strategies, enabling the business to both retain existing customers and attract new ones.
