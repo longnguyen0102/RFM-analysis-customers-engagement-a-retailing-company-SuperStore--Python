@@ -18,7 +18,6 @@ Tools Used: Python
 
 ## 📌 Background & Overview  
 
-### Objective:
 ### 📖 This project is about using Python to analyze given dataset.
 
 ✔️ SuperStore is a global retail company. **To celebrate Christmas and New Year**, Marketing team wants to deploy **marketing campaigns** in order to show appreciation to loyalty customers. Beside that, they want to engage with potential customers who could become loyal clients.  
