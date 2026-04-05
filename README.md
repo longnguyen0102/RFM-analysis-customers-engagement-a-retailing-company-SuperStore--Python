@@ -119,34 +119,36 @@ Sheet 'Segmentation'
 #### Ecommerce retail table    
 
 <details>
- <summary><strong>Basic data exploration:</strong></summary>
+ <summary><em>💾 Basic exploration:</em></summary>
 
  ```python
- df.head()
- 
+ df_ecommerce_detail.head()
+
  # show rows and columns count
- print(f'Rows count: {df.shape[0]}\nColums count: {df.shape[1]}')
+ print(f'Rows count: {df_ecommerce_detail.shape[0]}\nColums count: {df_ecommerce_detail.shape[1]}')
+ print('')
  
  # show data type
- df.info()
+ df_ecommerce_detail.info()
  
  # further checking on columns
- df.shape
- df.describe()
- 
- # check null values
- df.isnull().sum()
+ df_ecommerce_detail.shape
+ df_ecommerce_detail.describe()
  
  # check unique values
- ## print the percentage of unique
- num_unique = df.nunique().sort_values()
+ num_unique = df_ecommerce_detail.nunique().sort_values()
  print('')
  print('---Percentage of unique values (%)---')
  print(100/num_unique)
  
+ # check null values
+ print('')
+ print('---Number of null values---')
+ print(df_ecommerce_detail.isnull().sum())
+ 
  # check missing data
- missing_value = df.isnull().sum().sort_values(ascending = False)
- missing_percent = df.isnull().mean().sort_values(ascending = False)
+ missing_value = df_ecommerce_detail.isnull().sum().sort_values(ascending = False)
+ missing_percent = df_ecommerce_detail.isnull().mean().sort_values(ascending = False)
  print('')
  print('---Number of missing values in each column---')
  print(missing_value)
@@ -160,33 +162,76 @@ Sheet 'Segmentation'
  # check for duplicates
  ## show number of duplicated rows
  print('')
- print(f'Number of entirely duplicated rows: {df.duplicated().sum()}')
+ print(f'Number of entirely duplicated rows: {df_ecommerce_detail.duplicated().sum()}')
  ## show all duplicated rows
- df[df.duplicated()]
+ df_ecommerce_detail[df_ecommerce_detail.duplicated()]
  ```
-
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_1.png)  
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_2.png)
-
 </details>
 
-➡️ This dataset has 8 columns and 541,909 records. Most columns have right data type:  
-- InvoiceNo (object) -> change to string data type for further handling.  
-- CustomerID (float64) -> can be changed to int64 if needed.  
-  
-➡️ The percentage of duplicated values is acceptable. Missing values in "CustomerID" are high (~25%), it will affect the analysis. They need to verify and fill up as much as possible. 5268 rows of duplicating contain duplicated information of "Quantity", "InvoiceDate", "CustomerID", "Country". These rows are acceptable because there will be a customer buying many products in a day from any country.  
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_1.png)  
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_2.png)
+
+1. **Structure:** The data frame has 8 columns (`InvoiceNo`, `StockCode`, `Description`, `Quantity`, `InvoiceDate`, `UnitPrice`, `CustomerID`, `Country`) and 541,909 rows.  
+
+2. **Missing values:**  
+* `CustomerID` has the most missing values (**24.9%**), it will be looked further to identify the problems.  
+* `Description` has **1,454** missing rows.  
+
+3. **Data type:**  
+* `InvoiceDate` is in datetime data type. It can be seperated to Day, Month for further analysis.  
+* `CustomerID` could be changed to string data type.  
+
+4. **Observations:**  
+* Percentage of unique values in all columns are acceptable.  
+* All others columns do not have any missing values.  
+* There are **5,268 rows** with duplicated values. However, some rows have same data like `InvoiceNo`, `Quantity`, `InvoiceDate`, `CustomerID`, `Country` which means they are the same order with different items -> no need to investigate more.  
 
 <details>
- <summary><strong>Change data type of 'InvoiceNo' to string:</strong></summary>
+ <summary><em>💾 Negative values:</em></summary>
 
  ```python
- # change data type of Invoice No to string
- df['InvoiceNo'] = df['InvoiceNo'].astype(str)
+ # change data type of InvoiceNo to string data type
+ df_ecommerce_detail['InvoiceNo'] = df_ecommerce_detail['InvoiceNo'].astype(str)
  ```
+
+```python
+# print out some rows where Quantity < 0
+print('---Some rows have Quantity < 0---')
+print(df_ecommerce_detail[df_ecommerce_detail['Quantity']<0].head())
+print('')
+
+# print out some rows where UnitPrice < 0
+print('---Some rows have UnitPrice < 0---')
+print(df_ecommerce_detail[df_ecommerce_detail['UnitPrice']<0].head())
+
+# further checking
+## make a new column: True if InvoiceNo has 'C', False if InvoiceNo has no 'C'
+df_ecommerce_detail['Cancellation'] = df_ecommerce_detail['InvoiceNo'].str.contains('C')
+## check InvoiceNo has 'C' and Quantity < 0
+print('')
+print('---Data frame which has Cancellation and Quantity < 0---')
+print(df_ecommerce_detail[(df_ecommerce_detail['Cancellation'] == True) & (df_ecommerce_detail['Quantity'] < 0)].head())
+
+## check InvoiceNo has no 'C' and Quantity < 0
+print('')
+print('---Data frame which has no Cancellation and Quantity < 0---')
+df_ecommerce_detail[(df_ecommerce_detail['Cancellation'] == False) & (df_ecommerce_detail['Quantity'] < 0)].head()
+```
 
 </details>
 
-➡️ The purpose for this action: Easy for handling duplicated values.
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_negative_value_1.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_negative_value_2.png)
+
+Based on data type, columns `Quantity` and `UnitPrice` might have negative values (they both are in numbers).  
+
+1. Column `Quantity` have 2 cases: Invoices which are **cancelled** and **non-cancelled**:  
+* **Cancelled**: These invoices are cancelled order.  
+* **Non-cancelled**: Might be free gifts for promotional campaigns (buy 1 get 1 free, special offer, etc.). These will affect the stock of the store.  
+
+2. Column `UnitPrice`: As can be seen in `Description`, they are ***Adjust bad dept*** in 2 invoices **A563186** and **A563187**.  
+
+In this case, we can drop all rows with **negative values** and `InvoiceID` contains 'C' for cancellation.  
 
 <details>
  <summary><strong>Explore negative values of Quantity columns (Quantity < 0 and UnitPrice < 0):</strong></summary>
