@@ -116,7 +116,7 @@ Sheet 'Segmentation'
   ```
 </details>  
 
-#### Ecommerce retail table    
+#### 1️⃣ Ecommerce retail table    
 
 <details>
  <summary><em>💾 Basic exploration:</em></summary>
@@ -220,8 +220,7 @@ df_ecommerce_detail[(df_ecommerce_detail['Cancellation'] == False) & (df_ecommer
 
 </details>
 
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_negative_value_1.png)
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_negative_value_2.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_negative_value_1.png)
 
 Based on data type, columns `Quantity` and `UnitPrice` might have negative values (they both are in numbers).  
 
@@ -234,35 +233,71 @@ Based on data type, columns `Quantity` and `UnitPrice` might have negative value
 In this case, we can drop all rows with **negative values** and `InvoiceID` contains 'C' for cancellation.  
 
 <details>
- <summary><strong>Explore negative values of Quantity columns (Quantity < 0 and UnitPrice < 0):</strong></summary>
+ <summary><em>Dropping negative values:</em></summary>
+
+ ```python
+ # seperate InvoiceDate to Day and Month columns
+ df_ecommerce_detail['Day'] = pd.to_datetime(df_ecommerce_detail.InvoiceDate).dt.date
+ df_ecommerce_detail['Month'] = df_ecommerce_detail['Day'].apply(lambda x: str(x)[:-3])
+ 
+ # change data type of StockCode, CustomerID
+ df_ecommerce_detail['StockCode'] = df_ecommerce_detail['StockCode'].astype(str)
+ df_ecommerce_detail['CustomerID'] = df_ecommerce_detail['CustomerID'].astype(str)
+ ```
+
+```python
+# drop negative values in Quantity and UnitPrice column
+df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['Quantity'] > 0]
+df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['UnitPrice'] > 0]
+
+# drop InvoiceNo with C
+df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['Cancellation'] == False]
+
+# replace NaN
+df_ecommerce_detail = df_ecommerce_detail.replace('nan', None)
+df_ecommerce_detail = df_ecommerce_detail.replace('Nan', None)
+
+df_ecommerce_detail.info()
+
+print('')
+print('---Data frame after dropping negative values and cancelled orders---')
+df_ecommerce_detail.head(10)
+```
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_negative_value_2.png)
+
+<details>
+ <summary><em>Missing values:</em></summary>
   
  ```python
- # print out some rows where Quantity < 0
- print('Some rows have Quantity < 0')
- print(df[df['Quantity']<0].head())
+ # show up some rows with missing values
+ df_ecommerce_detail_null = df_ecommerce_detail.isnull()
+ rows_with_null = df_ecommerce_detail_null.any(axis=1)
+ df_ecommerce_detail_with_null = df_ecommerce_detail[rows_with_null]
  
- 
- # further checking
- ## make a new column: True if InvoiceNo has 'C', False if InvoiceNo has no 'C'
- df['Cancellation'] = df['InvoiceNo'].str.contains('C')
- 
- ## check InvoiceNo has 'C' and Quantity < 0
- print(df[(df['Cancellation'] == True) & (df['Quantity'] < 0)].head())
- print('asoidfbao',df['CustomerID'].isna().sum())
- 
- ## check InvoiceNo has no 'C' and Quantity < 0
- print(df[(df['Cancellation'] == False) & (df['Quantity'] < 0)].head())
+ print('---Some rows with missing values---')
+ df_ecommerce_detail_with_null.head(10)
  ```
+</details>
 
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_3.png)
+ ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_missing_value_1.png)
+
+ As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.
+
+<details>
+ <summary><em>Dropping missing values:</em></summary>
 
  ```python
- # print out some rows where Quantity < 0
- print('Some rows have UnitPrice < 0')
- print(df[df['UnitPrice'] < 0].head())
+ # drop rows with CustomerID == None
+ df_no_nan = df_ecommerce_detail.drop(df_ecommerce_detail[df_ecommerce_detail['CustomerID'].isnull()].index)
+ 
+ print('---Data frame after dropping missing values of CustomerID')
+ df_no_nan
  ```
+</details>
 
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_4.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_missing_value_2.png)
  
 </details>
 
