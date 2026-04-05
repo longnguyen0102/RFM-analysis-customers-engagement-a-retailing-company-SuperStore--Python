@@ -11,8 +11,9 @@ Tools Used: Python
 
 ## 📑 Table of Contents  
 1. [📌 Background & Overview](#-background--overview)  
-2. [📂 Dataset Description & Data Structure](#-dataset-description--data-structure)  
-3. [🔎 Final Conclusion & Recommendations](#-final-conclusion--recommendations)
+2. [📂 Dataset Description & Data Structure](#-dataset-description--data-structure)
+3. [⚒️ Main Process](#%EF%B8%8F-main-process)
+4. [📌 Key Takeaways](#-key-takeaways)
 
 ---
 
@@ -674,7 +675,9 @@ In the final step, the combined RFM scores are matched against the Segmentation 
 ➡️ Months in early and middle of the year are the time for launching **customer incentive and relation programs**. During these time, the need for buying is low. That is the reason for these programs to step in, they will attract more customers (even new ones) and increase customers' Frequency, like: price discount, buy 1 get 1, voucher for the next buying,...  
 ➡️ Months before sales increasing (such as September) is the time for **"heat up the market"**. Launching early promotion programs, new products, new collections are not the bad idea.  
 
-## 📌 Key Takeaways:  
+---
+
+## 📌 Key Takeaways
 ✔️ Understand how **RFM analysis** can be used to evaluate customer behavior based on purchase frequency and spending value.  
 ✔️ **Classify customers** into specific segments using RFM scores, helping identify which segments require enhanced experiences and which should be retained and nurtured to move toward higher-value tiers.  
 ✔️ Determine the **optimal timing** for launching promotional campaigns and upselling strategies, enabling the business to both retain existing customers and attract new ones.
