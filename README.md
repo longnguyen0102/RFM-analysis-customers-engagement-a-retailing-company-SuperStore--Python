@@ -1,7 +1,7 @@
 # RFM analysis customers' engagement a retailing company - SuperStore | Python
 
 Please check the code below or access via the link:  
-🔗 https://colab.research.google.com/drive/1cWVm4ttAOOfBJzVmswV8OovZ3s1xOa8H?usp=sharing 🔗    
+🔗 https://colab.research.google.com/drive/1JpsC7WbEjqM-twWg9XuNCCI8iE5cpbAa?usp=sharing 🔗    
 
 Author: Nguyễn Hải Long  
 Date: 2025-04  
@@ -89,12 +89,12 @@ Sheet 'Segmentation'
 
 *Note: Click the white triangle to see codes*  
 
-### 1️⃣ EDA
+### 💽 EDA
 <details>
- <summary><strong>Import libraries and dataset, copy dataset:</strong></summary>
+ <summary><em>💾 Import libraries and dataset, copy dataset, and explore tables:</em></summary>
   
   ```python
-  # import libraries
+  # import thư viện
   import pandas as pd
   import numpy as np
   from google.colab import drive
@@ -106,13 +106,17 @@ Sheet 'Segmentation'
   
   path = '/content/drive/MyDrive/DAC K34/Python/Project_3/ecommerce retail.xlsx'
   ecommerce_retail = pd.read_excel (path, sheet_name ='ecommerce retail')
+  segmentation = pd.read_excel (path, sheet_name ='Segmentation')
   
-  #copy dataframe
-  df = ecommerce_retail.copy()
+  #copy data frame ecommerce_retail
+  df_ecommerce_detail = ecommerce_retail.copy()
+  
+  # copy data frame Segmentation
+  df_seg = segmentation
   ```
 </details>  
 
-#### Understanding data    
+#### Ecommerce retail table    
 
 <details>
  <summary><strong>Basic data exploration:</strong></summary>
