@@ -302,28 +302,39 @@ df_ecommerce_detail.head(10)
  
 </details>
 
-➡️ There are two reasons behind Quantity < 0:
-- Orders with InvoiceNo has C are cancelled orders.
-- Rows with UnitPrice = 0 are returned orders.
-
-➡️ Orders with UnitPrice < 0 are in "Adjust bad dept" state as noted in "Description" column.  
-➡️ We can drop these rows to segment customers precisely.  
+As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.  
 
 <details>
- <summary><strong>Seperate "InvoiceDate" to "Day" and "Month" columns:</strong></summary>
+ <summary><em>Duplicated values:</em></summary>
   
  ```python
- # seperate InvoiceDate to Day and Month columns
- df['Day'] = pd.to_datetime(df.InvoiceDate).dt.date
- df['Month'] = df['Day'].apply(lambda x: str(x)[:-3])
- df.head()
+ # locate the values are not duplicated in the selected columns
+ df_no_dup = df_no_nan.loc[~df_ecommerce_detail.duplicated(subset = ['InvoiceNo','StockCode','InvoiceDate','UnitPrice','CustomerID','Country'])].reset_index(drop=True).copy()
  ```
 
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_5.png)
+```python
+# check an example of duplicate in InvoiceNo
+df_no_dup.query('InvoiceNo == "536365"')
+df_no_dup.query('InvoiceNo == "581587"')
+```
+
+ ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_duplicated_value_1.png)
 
 </details>
 
-➡️ The 'InvoiceDate' column is split into 'Day' and 'Month' to later identify the customer's most recent interaction date, which is essential for calculating the Recency metric.  
+1. Exploring duplicates among columns: `InvoiceNo`, `StockCode`, `InvoiceDate`, `UnitPrice`, `CustomerID`, `Country`:
+* In this step, we will find rows which have **duplicated information among these columns** then we will keep rows which have no duplicated values.
+* This step is a **wide exploration of data frame**, there might be some invoices which have same `UnitPrice` and `Country` values. The reason for this is **system error** or **typing error**, it creates double invoices.
+* We will drop rows which have duplicated information of 6 columns.
+
+2. Exploring duplicates in columns: `InvoiceNo`, `StockCode`, `InvoiceDate`, `CustomerID`:
+* This step only choose 4 columns for identifying **the unique of a transaction**.
+* `InvoiceNo` + `StockCode` are the **important key** because if there are any duplicates, it might be **error**.
+* `InvoiceDate` + `CustomerID` identify the **time of transaction** for which customer.
+* If there are any duplication, we only use the **first row**.
+* The reason for using only **4 columns** because they are "strong key" and other columns might be **distraction** for the calculation.
+
+3. After dropping all duplicated, this table will be the main data frame to be used in RFM analysis.
 
 #### Handle negative, missing values, duplicates:  
 
