@@ -311,7 +311,7 @@ df_main.head(10)
 
 Using ***df_main*** to create `Sales` column for calculating **Monetary** and creating a new data frame ***df_last_day*** for calculating **Recency**.  
 
-#### Handle Segmentation table
+#### 2️⃣ Handle Segmentation table
 
 <details>
  <summary><strong>Transform df_seg:</strong></summary>
@@ -332,7 +332,7 @@ Using ***df_main*** to create `Sales` column for calculating **Monetary** and cr
 * ***Segmentation*** table contains 2 columns: `Segment` and `RFM Score`.
 * The transformation of the Segmentation table will split segments based on predefined RFM scores. These scores are currently separated by commas, so this process will parse them into the required segments accordingly. 
 
-### 🧮 Calculating RFM
+### 🧮 CALCULATING RFM
 
 <details>
  <summary><em>Code:</em></summary>
@@ -372,7 +372,7 @@ Using ***df_main*** to create `Sales` column for calculating **Monetary** and cr
 Afterward, the results of the three metrics are assigned scores on a scale from 1 to 5.
 
 <details>
- <summary><strong>Merging with Segmentation table:</strong></summary>
+ <summary><em>Merging with Segmentation table:</em></summary>
 
  ```python
  # merge with Segementation for comparison
@@ -391,54 +391,134 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
 
 </details>
 
+### 💟 DETERMINE LOYAL AND NON-LOYAL AND SHOWING CHARACTERISTIC OF POTENTIAL LOYALIST  
+
 <details>
- <summary><strong>Creating df_RFM_final for visualization:</strong></summary>
- 
+ <summary><em>Determine Loyal and Non Loyal:</em></summary>
+
  ```python
- # Average of Quantity and Sales according to CustomerID
+ # loyal status
+ df_RFM_final['Loyal_Status'] = df_RFM_final['Segment'].apply(lambda x: 'Loyal' if x in ('Loyal','Champions') else 'Non Loyal')
+ 
+ print('---Some rows of data frame determine Loyal and Non Loyal---')
+ df_RFM_final.head(10)
+ ```
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_determine.png)
+
+<details>
+ <summary><em>Loyal and Non Loyal summary:</em></summary>
+
+ ```python
+ # calculating the percentage of Loyal_Status
+ loyal_counts = df_RFM_final['Loyal_Status'].value_counts()
+ loyal_percents = df_RFM_final['Loyal_Status'].value_counts(normalize=True) * 100
+ 
+ # creating data frame loyal_summary for visulization
+ loyal_summary = pd.DataFrame({
+     'Count': loyal_counts,
+     'Percentage (%)': loyal_percents
+ })
+ 
+ print('---Loyal summary---')
+ display(loyal_summary)
+ ```
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_loyal_summary.png)
+
+<details>
+ <summary><em>Segmentation summary:</em></summary>
+
+ ```python
+ # calculating the percentage of Segmentation
+ segment_counts = df_RFM_final['Segment'].value_counts()
+ segment_percents = df_RFM_final ['Segment'].value_counts(normalize=True) * 100
+ 
+ # creating data frame segment_summary for visulization
+ segment_summary = pd.DataFrame({
+     'Count': segment_counts,
+     'Percentage (%)': segment_percents
+ })
+ 
+ print('---Segment summary---')
+ display(segment_summary)
+ ```
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_segment_summary.png)
+
+Company identifies **Loyal** and **Champion** are in "Loyal status". Based on that there is only **7.7%** loyal customers. The number of non-loyal customers is quite high (**more than 90%**).  
+As can be seen on ***Segment Summary*** table, **Loyal**, **Promising**, **Potential Loyalist** have the same amount (about **3%**). **Lost customers** is almost high as **Champions**. Marketing team and sales team should be aware and focus on these groups: decreasing **Lost customers**, increasing **Loyal**.  
+
+<details>
+ <summary><em>Calculating average of Quantity and Sales according to CustomerID:</em></summary>
+
+ ```python
+ # average of Quantity and Sales according to CustomerID
  df_potential_average = df_main.groupby('CustomerID').agg(
      Quantity_Average = ('Quantity','mean'),
      Sales_Average = ('Sales','mean')
  ).reset_index()
  
- df_potential_average.head()
+ print('---Calculating average of quantity and sales---')
+ df_potential_average.head(10)
  ```
+</details>
 
- ![data_processing_5](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_5.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_calculate_average.png)  
+
+Calculating the average of quantity and sales hepls further understanding of **purchasing behvior** of each customer:
+1. `Sales_Average` differentiates the scale of orders. Customers with **high monetary** might purchase lots of order or they might have few orders with large price.
+
+2. Identify the characteristic of segment. Some groups might have high **Frequency** but low average number of sales. This one proves that their purchasing is constant with low price products. Marketing team might launch a compaign to encourage them to chosse high price products.
+
+3. `Quantity_Average` will help teams finding customer groups that purchase high volume, teams might offer them wholesale policy or discount price for certain products.
+
+<details>
+ <summary><em>Finding first Sales and Quantity according to CustomerID:</em></summary>
 
  ```python
- # First Sales and Quantity according to CustomerID
- ## base on InvoiceDate to get first order -> Quantity, Sales
+ # first Sales and Quantity according to CustomerID
+ ## based on InvoiceDate to get first order -> Quantity, Sales
  df_main['Ranking'] = df_main.groupby('CustomerID')['InvoiceDate'].rank(method = 'first')
  df_potential_first = df_main[df_main.Ranking == 1][['CustomerID','Quantity','Sales']]
  df_potential_first = df_potential_first.rename(columns={'Quantity':'First_Quantity','Sales':'First_Sales'})
  
- df_potential_first.head()
+ print('---First order of each customer---')
+ df_potential_first.head(10)
  ```
- 
- ![data_processing_6](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_6.png)
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_calculate_first_order.png) 
+
+This step aims to find out the quantity and sales of first order of each customer:  
+ 1. Identify **"starting point"**: `Start_Date` helps identify the date of first order. Comparing with promotional events in the past, we can see the effective of events: the number of orders, the number of new customers, etc.
+ 2. `First_Quantity` and `First_Sales` provides the behavior of customers: they might spend a lot of money on the first order or they might need time for experience new method.
+ 3. This step can deliver how much time does a customer bring profit to the company.
+
+<details>
+ <summary><em>Merge all to form a final data frame for visualization:</em></summary>
 
  ```python
  # merge all
  df_RFM_final = df_RFM_final.merge(df_potential_average, how = 'left', on = 'CustomerID')
  df_RFM_final = df_RFM_final.merge(df_potential_first, how = 'left', on = 'CustomerID')
  
- df_RFM_final.head()
+ print('---Final data frame---')
+ df_RFM_final.head(10)
  ```
 </details>
 
-|  | CustomerID | Recency | Frequency | Monetary | Start_Date | Reverse_Recency | R | F | M | RFM | Segment | RFM Score | Loyal_Status | Quantity_Average | Sales_Average | First_Quantity | First_Sales |
-|---|-----------|---------|-----------|----------|------------|-----------------|---|---|---|-----|---------|-----------|--------------|------------------|---------------|----------------|--------|
-| 0 | 12346.0 | 325 | 1 | 77183.60 | 2011-01-18 | -325 | 1 | 1 | 5 | 115 | Cannot Lose Them | 115 | Non Loyal | 74125.000000 | 77183.000000 | 74215 | 77183.6 |
-| 1 | 12347.0 | 2 | 182 | 4310.00 | 2010-12-07 | -2 | 5 | 5 | 5 | 555 | Champions | 555 | Non Loyal | 13.505495 | 23.681319 | 12 | 25.2 |
-| 2 | 12348.0 | 75 | 27 | 1595.64 | 2010-12-16 | -75 | 2 | 2 | 4 | 224 | At Risk | 224 | Non Loyal | 68.925926 | 59.097778 | 72 | 39.6 |
-| 3 | 12349.0 | 18 | 73 | 1757.55 | 2011-11-21 | -18 | 4 | 4 | 4 | 444 | Loyal | 444 | Loyal | 8.643836 | 24.076027 | 2 | 15.0 |
-| 4 | 12350.0 | 310 | 17 | 334.40 | 2011-02-02 | -310 | 1 | 2 | 2 | 122 | Hibernating customers | 122 | Non Loyal | 11.588235 | 19.670588 | 12 | 25.2 |
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/determine_loyal_final_data_frame.png) 
 
-### 3️⃣ Visualization  
+Merging 3 tables (***Main data frame***, ***Average number of quantity & sales***, ***First order of each customer***) for a clear review and visualization.  
+
+### 📊 VISUALIZATION
 
 <details>
- <summary><strong>Histogram for R, F, M scores:</strong></summary>
+ <summary><em>Creating histogram for R, F, M scores:</em></summary>
 
  ```python
  # Histograms for R, F, and M scores
@@ -474,15 +554,15 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_visualization_R_F_M.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/visualization_R_F_M.png)  
 
-➡️ As can be seen from the histogram:  
+As can be seen from the histogram:  
 - **Recency (R):** The chart shows that most customers have high Recency scores (4 and 5), concentrated on the right side of the distribution. This indicates that a majority of customers have made recent purchases. However, there is still a significant portion of customers with low Recency scores (1, 2, or 3), suggesting they haven't purchased in a while.
 - **Frequency (F):** The frequency distribution is left-skewed, with most customers having low Frequency scores (1 and 2). This indicates that the majority of customers do not purchase frequently. A small segment of customers with high Frequency scores (4 and 5) represents those who buy very regularly.
-- **Monetary (M):** The Monetary distribution is also left-skewed, similar to Frequency. This suggests that most customers have low spending values. Only a small number of customers have high Monetary scores (4 and 5), representing high-value spenders.  
+- **Monetary (M):** The Monetary distribution is also left-skewed, similar to Frequency. This suggests that most customers have low spending values. Only a small number of customers have high Monetary scores (4 and 5), representing high-value spenders.
 
 <details>
- <summary><strong>Visualize final dataset with RFM:</strong></summary>
+ <summary><em>Visualization of spending amount and number of user according to Segment:</em></summary>
 
  ```python
  # Visualize spending amount and number of user according to Segment.
@@ -506,12 +586,13 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_visualization.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/visualization_segment.png)  
 
 <details>
- <summary><strong>Visualize for sales trending:</strong></summary>
+ <summary><em>Visualization of Sales trend over time:</em></summary>
 
  ```python
+ # Calculate total sales per month
  monthly_sales = df_main.groupby('Month')['Sales'].sum().reset_index()
  
  # Convert Month to datetime for proper sorting
@@ -531,9 +612,9 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_visualization_sales_trending.png)
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/visualization_sales.png)  
 
-### 4️⃣ Insights and Actions (drawing from both graphs of RFM and sales trending)  
+### 🔍 Insights and Actions (drawing from both graphs of Spending amount and Sales trending)  
 
 ✔️ The **"Champions"** segment is the core revenue driver: The chart shows that the **"Champions"** group contributes the largest share of revenue—over 60%—despite representing only around 18% of the total customer base. This highlights the critical importance of this segment to SuperStore. These are the most frequent, recent, and high-spending customers.  
 ➡️ **Action:** It is essential to focus on maintaining and enhancing the experience for **"Champions"** to ensure stable and sustainable revenue.
