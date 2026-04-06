@@ -234,41 +234,6 @@ Based on data type, columns `Quantity` and `UnitPrice` might have negative value
 In this case, we can drop all rows with **negative values** and `InvoiceID` contains 'C' for cancellation.  
 
 <details>
- <summary><em>Dropping negative values:</em></summary>
-
- ```python
- # seperate InvoiceDate to Day and Month columns
- df_ecommerce_detail['Day'] = pd.to_datetime(df_ecommerce_detail.InvoiceDate).dt.date
- df_ecommerce_detail['Month'] = df_ecommerce_detail['Day'].apply(lambda x: str(x)[:-3])
- 
- # change data type of StockCode, CustomerID
- df_ecommerce_detail['StockCode'] = df_ecommerce_detail['StockCode'].astype(str)
- df_ecommerce_detail['CustomerID'] = df_ecommerce_detail['CustomerID'].astype(str)
- ```
-
-```python
-# drop negative values in Quantity and UnitPrice column
-df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['Quantity'] > 0]
-df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['UnitPrice'] > 0]
-
-# drop InvoiceNo with C
-df_ecommerce_detail = df_ecommerce_detail[df_ecommerce_detail['Cancellation'] == False]
-
-# replace NaN
-df_ecommerce_detail = df_ecommerce_detail.replace('nan', None)
-df_ecommerce_detail = df_ecommerce_detail.replace('Nan', None)
-
-df_ecommerce_detail.info()
-
-print('')
-print('---Data frame after dropping negative values and cancelled orders---')
-df_ecommerce_detail.head(10)
-```
-</details>
-
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_negative_value_2.png)
-
-<details>
  <summary><em>Missing values:</em></summary>
   
  ```python
@@ -287,24 +252,6 @@ df_ecommerce_detail.head(10)
  As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.
 
 <details>
- <summary><em>Dropping missing values:</em></summary>
-
- ```python
- # drop rows with CustomerID == None
- df_no_nan = df_ecommerce_detail.drop(df_ecommerce_detail[df_ecommerce_detail['CustomerID'].isnull()].index)
- 
- print('---Data frame after dropping missing values of CustomerID')
- df_no_nan
- ```
-</details>
-
-![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_missing_value_2.png)
- 
-</details>
-
-As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.  
-
-<details>
  <summary><em>Duplicated values:</em></summary>
   
  ```python
@@ -318,9 +265,17 @@ df_no_dup.query('InvoiceNo == "536365"')
 df_no_dup.query('InvoiceNo == "581587"')
 ```
 
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_duplicated_value_1.png)
+```python
+# drop duplicates, keep the first row of subset
+df_main = df_ecommerce_detail.drop_duplicates(subset=["InvoiceNo", "StockCode","InvoiceDate","CustomerID"], keep = 'first')
+
+print('---Data frame after dropping duplicates---')
+df_main.head(10)
+```
 
 </details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_duplicated_value_1.png)
 
 1. Exploring duplicates among columns: `InvoiceNo`, `StockCode`, `InvoiceDate`, `UnitPrice`, `CustomerID`, `Country`:
 * In this step, we will find rows which have **duplicated information among these columns** then we will keep rows which have no duplicated values.
@@ -336,142 +291,55 @@ df_no_dup.query('InvoiceNo == "581587"')
 
 3. After dropping all duplicated, this table will be the main data frame to be used in RFM analysis.
 
-#### Handle negative, missing values, duplicates:  
-
 <details>
- <summary><strong>Negative values:</strong></summary>
-  
- ```python
- # change data type
- df['StockCode'] = df['StockCode'].astype(str)
- df['Description'] = df['Description'].astype(str)
- df['CustomerID'] = df['CustomerID'].astype(str)
- df['Country'] = df['Country'].astype(str)
- 
- # drop negative values in Quantity and UnitPrice column
- df = df[df['Quantity'] > 0]
- df = df[df['UnitPrice'] > 0]
- 
- # drop InvoiceNo with C
- df = df[df['Cancellation'] == False]
- 
- # replace NaN
- df = df.replace('nan', None)
- df = df.replace('Nan', None)
- 
- df.info()
- ```
+ <summary><em>Creating Sales column and final version of data frame</em></summary>
 
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_6.png)
+```python
+# create Sales column (Quantity * UnitPrice)
+df_main['Sales'] = df_main.Quantity * df_main.UnitPrice
 
+# take max('Day') for recently interaction of customer
+df_last_day = df_main.Day.max()
+
+print('---Final version of data frame for calculating RFM---')
+df_main.head(10)
+```
+ 
 </details>
 
-➡️ Remove all negative values in 'Quantity', 'UnitPrice' and 'InvoiceNo' with 'C' because they are cancelled orders.  
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_creating_sales_column.png)
+
+Using ***df_main*** to create `Sales` column for calculating **Monetary** and creating a new data frame ***df_last_day*** for calculating **Recency**.  
+
+#### Handle Segmentation table
 
 <details>
- <summary><strong>Missing values:</strong></summary>
+ <summary><strong>Transform df_seg:</strong></summary>
   
  ```python
- # show up some rows with missing values
- print('---Some rows with missing values---')
- df_null = df.isnull()
- rows_with_null = df_null.any(axis=1)
- df_with_null = df[rows_with_null]
- print(df_with_null.head(10))
- ```
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_7.png)
- 
- ```python
- # drop rows with CustomerID == None
- df_no_na = df.drop(df[df['CustomerID'].isnull()].index)
- df_no_na
- ```
-
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_8.png)
-
-</details>
-
-➡️ Drop all rows with 'CustomerID' is null. The reason for this action is cannot identify the customers.  
-
-<details>
- <summary><strong>Duplicated values:</strong></summary>
-  
- ```python
- # locate the values are not duplicated in the selected columns
- df_no_dup = df_no_na.loc[~df.duplicated(subset = ['InvoiceNo','StockCode','InvoiceDate','UnitPrice','CustomerID','Country'])].reset_index(drop=True).copy()
- 
- # check an example of duplicate in InvoiceNo
- df_no_dup.query('InvoiceNo == "536365"')
- 
- df_no_dup.query('InvoiceNo == "581587"')
- ```
- 
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_9.png)
- 
- ```python
- # drop duplicates, keep the first row of subset
- df_main = df.drop_duplicates(subset=["InvoiceNo", "StockCode","InvoiceDate","CustomerID"], keep = 'first')
- 
- df_main.head()
- ```
-
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_10.png)
-
-</details>
-
-➡️ In this step, we drop all duplicated rows with same information from all columns "InvoiceNo", "StockCode", "InvoiceDate", "UnitPrice", "CustomerID", "Country". Then with the remaining result, keeping only the first rows for R-F-M calculation.  
-
-<details>
- <summary><strong>Create 'Sales' column (Quantity * Price):</strong></summary>
-  
- ```python
- # create Sales column (Quantity * UnitPrice)
- df_main['Sales'] = df_main.Quantity * df.UnitPrice
- 
- # take max('Day') for recently interaction of customer
- last_day = df_main.Day.max()
- 
- last_day
- df_main
- ```
-
- ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_eda_11.png)
-
-</details>
-
-➡️ Taking max of 'Day' in order to identify the most recent date of interaction of customers.  
-
-### 2️⃣ Data processing   
-
-<details>
- <summary><strong>Handle Segmentation table</strong></summary>  
-
- ```python
- # import excel files with sheet name 'Segmentation'
- segmentation = pd.read_excel (path, sheet_name ='Segmentation')
- 
- # copy dataframe
- df_seg = segmentation
- 
- # transform Segmentation
+ #transform df_seg
  df_seg['RFM Score'] = df_seg['RFM Score'].str.split(',')
  df_seg = df_seg.explode('RFM Score').reset_index(drop=True)
  
+ print('---Segmentation table after split---')
  df_seg.head()
  ```
 
- ![data_processing_1](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_1.png)  
-
 </details>
 
-➡️ The Segmentation copy process involves duplicating a new Segmentation table to avoid interference with the original dataset, thereby preventing unintended data modifications. The transformation of the Segmentation table will split segments based on predefined RFM scores. These scores are currently separated by commas, so this process will parse them into the required segments accordingly.  
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/handle_segmentation_detail_split.png)
+
+* ***Segmentation*** table contains 2 columns: `Segment` and `RFM Score`.
+* The transformation of the Segmentation table will split segments based on predefined RFM scores. These scores are currently separated by commas, so this process will parse them into the required segments accordingly. 
+
+### 🧮 Calculating RFM
+
 <details>
- <summary><strong>Calculating RFM</strong></summary>
- 
+ <summary><em>Code:</em></summary>
+
  ```python
- # determining Recency, Frequency, Monetary
  df_RFM = df_main.groupby('CustomerID').agg(
-     Recency = ('Day', lambda x: last_day - x.max()),
+     Recency = ('Day', lambda x: df_last_day - x.max()),
      Frequency = ('CustomerID','count'),
      Monetary = ('Sales','sum'),
      Start_Date = ('Day','min')
@@ -481,50 +349,45 @@ df_no_dup.query('InvoiceNo == "581587"')
  # take opposite of Recency
  df_RFM['Reverse_Recency'] = -df_RFM['Recency']
  df_RFM['Start_Date'] = pd.to_datetime(df_RFM.Start_Date)
- 
+ ```
+
+ ```python
  # label R, F, M
  df_RFM['R'] = pd.qcut(df_RFM['Reverse_Recency'], 5, labels = range(1,6)).astype(str)
  df_RFM['F'] = pd.qcut(df_RFM['Frequency'], 5, labels = range(1,6)).astype(str)
  df_RFM['M'] = pd.qcut(df_RFM['Monetary'], 5, labels = range(1,6)).astype(str)
  df_RFM['RFM'] = df_RFM.R + df_RFM.F + df_RFM.M
  
- df_RFM.head()
+ print('---After calculating Recency, Frequency, and Monetary and labeling---')
+ df_RFM.head(10)
  ```
- ![data_processing_2](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_2.png)
+</details>
+
+![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/rfm_calculating_rfm.png)
+
+**In this stage, RFM is calculated:**  
+  1. **Recency** is computed as the last purchase date minus the dataset’s maximum date, the low value the better. However, the convenience in label, we use negative value of Recency. That means **the bigger the better**, and ranking is from 1 = worst to 5 = best.  
+  2. **Frequency** measures how often a customer makes a purchase and is computed as counting the number of appearance of each customer, **the bigger the better**.  
+  3. **Monetary** represents the total of money spending from each customer, **the bigger the better**.
+Afterward, the results of the three metrics are assigned scores on a scale from 1 to 5.
+
+<details>
+ <summary><strong>Merging with Segmentation table:</strong></summary>
 
  ```python
- # clear space
- df_seg['RFM Score'] = df_seg['RFM Score'].str.strip()
- 
  # merge with Segementation for comparison
  df_RFM_final = df_RFM.merge(df_seg, how='left', left_on='RFM', right_on='RFM Score')
  
- df_RFM_final.head()
+ # clear space
+ df_seg['RFM Score'] = df_seg['RFM Score'].str.strip()
+ 
+ print('---Merge data frame with Segmentation table for segment customers---')
+ df_RFM_final.head(10)
  ```
 
- ![data_processing_3](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_3.png)
+ ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/rfm_merge_with%20segmentation_table.png)
 
-</details>
-
-**In this stage, RFM is calculated:**  
-  1. Recency is computed as the last purchase date minus the dataset’s maximum date, the low value the better. However, the convenience in label, we use negative value of Recency. That means **the bigger the better**, and ranking is from 1 = worst to 5 = best.  
-  2. Frequency measures how often a customer makes a purchase and is computed as counting the number of appearance of each customer, **the bigger the better**.  
-  3. Monetary represents the total of money spending from each customer, **the bigger the better**.  
-Afterward, the results of the three metrics are assigned scores on a scale from 1 to 5.
-In the final step, the combined RFM scores are matched against the Segmentation table to assign each customer to a corresponding segment.  
-
-<details>
- <summary><strong>Determine Loyal and Non Loyal and showing characteristic of Potential Loyalist:</strong></summary>
-
- ```python
- df_RFM_final['Loyal_Status'] = df_RFM_final['Segment'].apply(lambda x: 'Loyal' if x in ('Loyal','Potential Loyalist') else 'Non Loyal')
-
- df_RFM_final.head()
- ```
-
- ![data_processing_4](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/RFM_analysis-retail-python_data_processing_4.png)
-
-➡️ Determining "Loyal" and "Non Loyal" state based on Segmentation table.
+In this final step, the combined RFM scores are matched against the ***Segmentation*** table to assign each customer to a corresponding segment.  
 
 </details>
 
