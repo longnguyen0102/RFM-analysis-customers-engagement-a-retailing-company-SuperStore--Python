@@ -521,7 +521,7 @@ Merging 3 tables (***Main data frame***, ***Average number of quantity & sales**
  <summary><em>Creating histogram for R, F, M scores:</em></summary>
 
  ```python
- # Histograms for R, F, and M scores
+ # Histograms for R, F, and M scores with smoothed KDE
  fig, axes = plt.subplots(1, 3, figsize=(18, 6))
  
  # Convert R, F, and M columns to integer type for correct ordering
@@ -529,28 +529,53 @@ Merging 3 tables (***Main data frame***, ***Average number of quantity & sales**
  df_RFM_final['F_int'] = df_RFM_final['F'].astype(int)
  df_RFM_final['M_int'] = df_RFM_final['M'].astype(int)
  
- 
- sns.histplot(data=df_RFM_final, x='R_int', ax=axes[0], kde=True, discrete=True)
+ # Using bw_adjust to smooth the KDE curve into a single trend line
+ sns.histplot(data=df_RFM_final, x='R_int', ax=axes[0], kde=True, discrete=True, kde_kws={'bw_adjust': 2})
  axes[0].set_title('Distribution of Recency (R) Scores')
  axes[0].set_xlabel('Recency Score')
  axes[0].set_ylabel('Number of Customers')
- axes[0].set_xticks(range(1, 6)) # Set explicit tick locations
+ axes[0].set_xticks(range(1, 6))
  
- sns.histplot(data=df_RFM_final, x='F_int', ax=axes[1], kde=True, discrete=True)
+ sns.histplot(data=df_RFM_final, x='F_int', ax=axes[1], kde=True, discrete=True, kde_kws={'bw_adjust': 2})
  axes[1].set_title('Distribution of Frequency (F) Scores')
  axes[1].set_xlabel('Frequency Score')
  axes[1].set_ylabel('Number of Customers')
- axes[1].set_xticks(range(1, 6)) # Set explicit tick locations
+ axes[1].set_xticks(range(1, 6))
  
- sns.histplot(data=df_RFM_final, x='M_int', ax=axes[2], kde=True, discrete=True)
+ sns.histplot(data=df_RFM_final, x='M_int', ax=axes[2], kde=True, discrete=True, kde_kws={'bw_adjust': 2})
  axes[2].set_title('Distribution of Monetary (M) Scores')
  axes[2].set_xlabel('Monetary Score')
  axes[2].set_ylabel('Number of Customers')
- axes[2].set_xticks(range(1, 6)) # Set explicit tick locations
- 
+ axes[2].set_xticks(range(1, 6))
  
  plt.tight_layout()
  plt.show()
+ 
+ def get_kde_values(data, points):
+     #KDE with bw_adjust=2 same in plot
+     kde = gaussian_kde(data, bw_method='scott')
+     kde.set_bandwidth(bw_method=kde.factor * 2)
+     return kde.evaluate(points)
+ 
+ # points from 1 to 5
+ x_points = np.array([1, 2, 3, 4, 5])
+ 
+ # calculate density for r, f, m
+ r_density = get_kde_values(df_RFM_final['R_int'], x_points)
+ f_density = get_kde_values(df_RFM_final['F_int'], x_points)
+ m_density = get_kde_values(df_RFM_final['M_int'], x_points)
+ 
+ # create summary table
+ kde_summary = pd.DataFrame({
+     'RFM_Score': x_points,
+     'Recency_Density': r_density,
+     'Frequency_Density': f_density,
+     'Monetary_Density': m_density
+ })
+ 
+ print('')
+ print('--- KDE Density at each score ---')
+ display(kde_summary.style.format("{:.4f}", subset=['Recency_Density', 'Frequency_Density', 'Monetary_Density']))
  ```
 </details>
 
