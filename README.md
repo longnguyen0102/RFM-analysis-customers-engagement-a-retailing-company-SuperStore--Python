@@ -582,9 +582,9 @@ Merging 3 tables (***Main data frame***, ***Average number of quantity & sales**
 ![](https://github.com/longnguyen0102/photo/blob/main/RFM_analysis-retail-python/visualization_R_F_M.png)  
 
 As can be seen from the histogram:  
-- **Recency (R):** The chart shows that most customers have high Recency scores (4 and 5), concentrated on the right side of the distribution. This indicates that a majority of customers have made recent purchases. However, there is still a significant portion of customers with low Recency scores (1, 2, or 3), suggesting they haven't purchased in a while.
-- **Frequency (F):** The frequency distribution is left-skewed, with most customers having low Frequency scores (1 and 2). This indicates that the majority of customers do not purchase frequently. A small segment of customers with high Frequency scores (4 and 5) represents those who buy very regularly.
-- **Monetary (M):** The Monetary distribution is also left-skewed, similar to Frequency. This suggests that most customers have low spending values. Only a small number of customers have high Monetary scores (4 and 5), representing high-value spenders.
+- **Recency (R):** As can be seen from the **KDE** - Kernel Density Estimation, it leans to **the right** which has **high score** (4 and 5). This means most customers have **high Recency**. The majority of customers have made recent purchases. However, there is still a significant portion of customers with **low Recency scores** (1, 2, or 3), suggesting they haven't purchased in a while.
+- **Frequency (F):** The frequency distribution is left-skewed, with most customers having **low Frequency** scores (1 and 2). This indicates that the majority of customers do not purchase frequently. A small segment of customers with high Frequency scores (4 and 5) represents those who buy very regularly.
+- **Monetary (M):** The Monetary distribution is also left-skewed, similar to Frequency. This suggests that most customers have **low spending** values. Only a small number of customers have high Monetary scores (4 and 5), representing high-value spenders. 
 
 <details>
  <summary><em>Visualization of spending amount and number of user according to Segment:</em></summary>
