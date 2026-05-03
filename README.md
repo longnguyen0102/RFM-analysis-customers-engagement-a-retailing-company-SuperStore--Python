@@ -169,8 +169,9 @@ Sheet 'Segmentation'
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_1.png)  
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_2.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_1.png)  
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_2.png)
+
 
 1. **Structure:** The data frame has 8 columns (`InvoiceNo`, `StockCode`, `Description`, `Quantity`, `InvoiceDate`, `UnitPrice`, `CustomerID`, `Country`) and 541,909 rows.  
 
@@ -221,7 +222,7 @@ df_ecommerce_detail[(df_ecommerce_detail['Cancellation'] == False) & (df_ecommer
 
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_negative_value_1.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_negative_value_1.png)
 
 Based on data type, columns `Quantity` and `UnitPrice` might have negative values (they both are in numbers).  
 
@@ -247,7 +248,7 @@ In this case, we can drop all rows with **negative values** and `InvoiceID` cont
  ```
 </details>
 
- ![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_missing_value_1.png)
+ ![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_missing_value_1.png)
 
  As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.
 
@@ -275,7 +276,7 @@ df_main.head(10)
 
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_duplicated_value_1.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_duplicated_value_1.png)
 
 1. Exploring duplicates among columns: `InvoiceNo`, `StockCode`, `InvoiceDate`, `UnitPrice`, `CustomerID`, `Country`:
 * In this step, we will find rows which have **duplicated information among these columns** then we will keep rows which have no duplicated values.
@@ -307,7 +308,7 @@ df_main.head(10)
  
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_ecommerce_detail_table_creating_sales_column.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_ecommerce_detail_table_creating_sales_column.png)
 
 Using ***df_main*** to create `Sales` column for calculating **Monetary** and creating a new data frame ***df_last_day*** for calculating **Recency**.  
 
@@ -327,7 +328,7 @@ Using ***df_main*** to create `Sales` column for calculating **Monetary** and cr
 
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/handle_segmentation_detail_split.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/handle_segmentation_detail_split.png)
 
 * ***Segmentation*** table contains 2 columns: `Segment` and `RFM Score`.
 * The transformation of the Segmentation table will split segments based on predefined RFM scores. These scores are currently separated by commas, so this process will parse them into the required segments accordingly. 
@@ -363,7 +364,7 @@ Using ***df_main*** to create `Sales` column for calculating **Monetary** and cr
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/rfm_calculating_rfm.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/rfm_calculating_rfm.png)
 
 **In this stage, RFM is calculated:**  
   1. **Recency** is computed as the last purchase date minus the dataset’s maximum date, the low value the better. However, the convenience in label, we use negative value of Recency. That means **the bigger the better**, and ranking is from 1 = worst to 5 = best.  
@@ -385,7 +386,7 @@ Afterward, the results of the three metrics are assigned scores on a scale from 
  df_RFM_final.head(10)
  ```
 
- ![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/rfm_merge_with%20segmentation_table.png)
+ ![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/rfm_merge_with%20segmentation_table.png)
 
 In this final step, the combined RFM scores are matched against the ***Segmentation*** table to assign each customer to a corresponding segment.  
 
@@ -405,7 +406,7 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/determine_loyal_determine.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/determine_loyal_determine.png)
 
 <details>
  <summary><em>Loyal and Non Loyal summary:</em></summary>
@@ -426,7 +427,7 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/determine_loyal_loyal_summary.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/determine_loyal_loyal_summary.png)
 
 <details>
  <summary><em>Segmentation summary:</em></summary>
@@ -447,7 +448,7 @@ In this final step, the combined RFM scores are matched against the ***Segmentat
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/determine_loyal_segment_summary.png)
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/determine_loyal_segment_summary.png)
 
 Company identifies **Loyal** and **Champion** are in "Loyal status". Based on that there is only **7.7%** loyal customers. The number of non-loyal customers is quite high (**more than 90%**).  
 As can be seen on ***Segment Summary*** table, **Loyal**, **Promising**, **Potential Loyalist** have the same amount (about **3%**). **Lost customers** is almost high as **Champions**. Marketing team and sales team should be aware and focus on these groups: decreasing **Lost customers**, increasing **Loyal**.  
@@ -467,7 +468,7 @@ As can be seen on ***Segment Summary*** table, **Loyal**, **Promising**, **Poten
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/determine_loyal_calculate_average.png)  
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/determine_loyal_calculate_average.png)  
 
 Calculating the average of quantity and sales hepls further understanding of **purchasing behvior** of each customer:
 1. `Sales_Average` differentiates the scale of orders. Customers with **high monetary** might purchase lots of order or they might have few orders with large price.
@@ -511,7 +512,7 @@ This step aims to find out the quantity and sales of first order of each custome
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/determine_loyal_final_data_frame.png) 
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/determine_loyal_final_data_frame.png) 
 
 Merging 3 tables (***Main data frame***, ***Average number of quantity & sales***, ***First order of each customer***) for a clear review and visualization.  
 
@@ -579,7 +580,7 @@ Merging 3 tables (***Main data frame***, ***Average number of quantity & sales**
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/visualization_R_F_M.png)  
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/visualization_R_F_M.png)  
 
 As can be seen from the histogram:  
 - **Recency (R):** As can be seen from the **KDE** - Kernel Density Estimation, it leans to **the right** which has **high score** (4 and 5). This means most customers have **high Recency**. The majority of customers have made recent purchases. However, there is still a significant portion of customers with **low Recency scores** (1, 2, or 3), suggesting they haven't purchased in a while.
@@ -611,7 +612,7 @@ As can be seen from the histogram:
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/visualization_segment.png)  
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/visualization_segment.png)  
 
 <details>
  <summary><em>Visualization of Sales trend over time:</em></summary>
@@ -637,7 +638,7 @@ As can be seen from the histogram:
  ```
 </details>
 
-![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/visualization_sales.png)  
+![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/visualization_sales.png)  
 
 ### 🔍 Insights and Actions (drawing from both graphs of Spending amount and Sales trending)  
 
