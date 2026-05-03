@@ -235,7 +235,7 @@ Based on data type, columns `Quantity` and `UnitPrice` might have negative value
 In this case, we can drop all rows with **negative values** and `InvoiceID` contains 'C' for cancellation.  
 
 <details>
- <summary><em>Missing values:</em></summary>
+ <summary><em>💾 Missing values:</em></summary>
   
  ```python
  # show up some rows with missing values
@@ -253,7 +253,7 @@ In this case, we can drop all rows with **negative values** and `InvoiceID` cont
  As can be seen above, only `CustomerID` column has missing values. In this case, Marketing team wants to deploy marketing campaigns in order to show appreciation to **loyalty customers**. However, with these missing data, these rows can be dropped for identifying loyalty customers by using RFM model.
 
 <details>
- <summary><em>Duplicated values:</em></summary>
+ <summary><em>💾 Duplicated values:</em></summary>
   
  ```python
  # locate the values are not duplicated in the selected columns
