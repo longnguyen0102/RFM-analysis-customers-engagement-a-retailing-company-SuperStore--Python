@@ -388,9 +388,9 @@ Afterward, the results of the three metrics are assigned scores on a scale from 
 
  ![](https://github.com/longnguyen0102/RFM-analysis-customers-engagement-a-retailing-company-SuperStore--Python/blob/main/RFM_analysis-retail-python/rfm_merge_with%20segmentation_table.png)
 
-In this final step, the combined RFM scores are matched against the ***Segmentation*** table to assign each customer to a corresponding segment.  
-
 </details>
+
+In this final step, the combined RFM scores are matched against the ***Segmentation*** table to assign each customer to a corresponding segment.  
 
 ### 💟 DETERMINE LOYAL AND NON-LOYAL AND SHOWING CHARACTERISTIC OF POTENTIAL LOYALIST  
 
